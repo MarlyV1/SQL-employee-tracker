@@ -8,5 +8,9 @@
     "start": "node server.js"
   },
   "author": "Marly Valcin",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^8.2.4",
+    "pg": "^8.11.5"
+  }
 }
