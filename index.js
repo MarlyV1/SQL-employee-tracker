@@ -14,7 +14,7 @@ const listQuestion = [
 function listOptions() {
     return inquirer.prompt(listQuestion)
     .then((data) => {
-    data = data.listOptions;
+    data = data.choices;
     // console.log(data);
     
     if (data === "View All Employees") {
@@ -45,9 +45,34 @@ function addDepartment() {
     ])
     .then((data) => {
         
-        console.log(`Added ${data.addDepartment} to the database`)
+        console.log(`Added ${data.department} to the database`)
     })
-}
+};
+
+
+function addRole() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "role",
+            message: "What is the name of the role?"
+        },
+        {
+            type: "input",
+            name: "salary",
+            message: "What is the salary of the role?"
+        },
+        {
+            type: "input",
+            name: "department",
+            message: "Which department does the role belong to?",
+            choices: ["Engineering", "Finance", "Legal", "Sales", "Service"]
+        }
+    ])
+    .then((data) => {
+        console.log(`Added ${role} to the database`)
+    })
+};
 
 listOptions();
 
