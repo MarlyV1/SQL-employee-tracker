@@ -49,6 +49,35 @@ function addDepartment() {
     })
 };
 
+function addEmployee() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "firstName",
+            message: "What is the employee's first name?"
+        },
+        {
+            type: "input",
+            name: "lastName",
+            message: "What is the employee's last name?"
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "What is the employee's role?",
+            choices: ["Sales Lead", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Customer Service"]
+        },
+        {
+            type: "list",
+            name: "manager",
+            message: "Who is the employee's manager?",
+            choices: ["Jane Smith", "Tom Allen", "Paul Parker", "Horacio Caner"]
+        }
+    ])
+    .then((data) => {
+        console.log(`Added ${data.firstName} ${data.lastName} to the database`)
+    })
+}
 
 function addRole() {
     inquirer.prompt([
@@ -63,7 +92,7 @@ function addRole() {
             message: "What is the salary of the role?"
         },
         {
-            type: "input",
+            type: "list",
             name: "department",
             message: "Which department does the role belong to?",
             choices: ["Engineering", "Finance", "Legal", "Sales", "Service"]
