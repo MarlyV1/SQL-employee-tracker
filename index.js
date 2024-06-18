@@ -1,39 +1,39 @@
 const inquirer = require('inquirer');
 
 
-const listQuestion = [
-    {
-        type: "list",
-        name: "listOptions",
-        message: "What would you like to do?",
-        choices: ["View All Employees", "Add Employee", "Update Employee Role", "Add Role", "View All Departments", "Add Department", "Quit"]
-    }
-];
-
-
-function listOptions() {
-    return inquirer.prompt(listQuestion)
+function userOptions() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "listOptions",
+            message: "What would you like to do?",
+            choices: ["View All Employees", "Add Employee", "Update Employee Role", "Add Role", "View All Departments", "Add Department", "Quit"]
+        }
+    ])
     .then((data) => {
-    data = data.choices;
-    // console.log(data);
-    
-    if (data === "View All Employees") {
+        console.log(data);
+        
+        data = data.choices;
 
-    }else if(data === "Add Employee") {
+        if (data === "View All Employees") {
 
-    }else if (data === "Update Employee Role") {
+        } else if (data === "Add Employee") {
 
-    }else if (data === "Add Role") {
+        } else if (data === "Update Employee Role") {
 
-    }else if(data === "View All Departments") {
+        } else if (data === "Add Role") {
 
-    }else if (data === "Add Department"){
+        } else if (data === "View All Departments") {
 
-    }
-    return;
-    // return listOptions();
+        } else if (data === "Add Department") {
+
+        }
+        return;
     })
-};
+
+}
+
+
 
 function addDepartment() {
     inquirer.prompt([
@@ -43,10 +43,10 @@ function addDepartment() {
             message: "What is the name of the department?"
         }
     ])
-    .then((data) => {
-        
-        console.log(`Added ${data.department} to the database`)
-    })
+        .then((data) => {
+
+            console.log(`Added ${data.department} to the database`)
+        })
 };
 
 function addEmployee() {
@@ -74,9 +74,9 @@ function addEmployee() {
             choices: ["Jane Smith", "Tom Allen", "Paul Parker", "Horacio Caner"]
         }
     ])
-    .then((data) => {
-        console.log(`Added ${data.firstName} ${data.lastName} to the database`)
-    })
+        .then((data) => {
+            console.log(`Added ${data.firstName} ${data.lastName} to the database`)
+        })
 };
 
 function addRole() {
@@ -98,9 +98,9 @@ function addRole() {
             choices: ["Engineering", "Finance", "Legal", "Sales", "Service"]
         }
     ])
-    .then((data) => {
-        console.log(`Added ${role} to the database`)
-    })
+        .then((data) => {
+            console.log(`Added ${role} to the database`)
+        })
 };
 
 function updateEmployeeRole() {
@@ -118,9 +118,9 @@ function updateEmployeeRole() {
             choices: ["Sales Lead", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Customer Service"]
         }
     ])
-    .then((data) => {
-        console.log("Updated employee's role")
-    })
+        .then((data) => {
+            console.log("Updated employee's role")
+        })
 }
 
 listOptions();
