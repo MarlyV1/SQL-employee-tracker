@@ -77,7 +77,7 @@ function addEmployee() {
     .then((data) => {
         console.log(`Added ${data.firstName} ${data.lastName} to the database`)
     })
-}
+};
 
 function addRole() {
     inquirer.prompt([
@@ -102,6 +102,26 @@ function addRole() {
         console.log(`Added ${role} to the database`)
     })
 };
+
+function updateEmployeeRole() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: 'employee',
+            message: "Which employee's role do you want to update?",
+            choices: ["John Doe", "Jane Smith", "Thalia Brown", "Tom Allen", "Michelle Johnson", "Paul Parker", "Alex Woods", "Horacio Cane"]
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "Which role do you want to assign the selected employee?",
+            choices: ["Sales Lead", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Customer Service"]
+        }
+    ])
+    .then((data) => {
+        console.log("Updated employee's role")
+    })
+}
 
 listOptions();
 
