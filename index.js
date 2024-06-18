@@ -17,16 +17,16 @@ function userOptions() {
 
         if (data === "View All Employees") {
 
-        } else if (data === "Add Employee") {
+        } else if (data === "Add Employees") {
 
         } else if (data === "Update Employee Role") {
-
+            updateEmployeeRole();
         } else if (data === "Add Role") {
-
+            addRole();
         } else if (data === "View All Departments") {
 
         } else if (data === "Add Department") {
-
+            addDepartment();
         }
         return;
     })
@@ -123,5 +123,4 @@ function updateEmployeeRole() {
         })
 }
 
-listOptions();
-
+userOptions();
