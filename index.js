@@ -25,7 +25,7 @@ function userOptions() {
         .then((data) => {
             console.log(data);
 
-            data = data.choices;
+            
 
             if (data === "View All Employees") {
 
@@ -135,9 +135,21 @@ function addRole() {
             choices: ["Engineering", "Finance", "Legal", "Sales", "Service"]
         }
     ])
-        .then((data) => {
-            console.log(`Added ${role} to the database`)
-        })
+    .then((data) => {
+        async function newRole() {
+           try {
+                const { role, salary, department } = data;
+                const department_id = departmentID(department);
+                const client = await pool.connect();
+                const roleData = await client.query(`insert into role (role, salary, department_id) values($1, $2, $3)`, [role, salary, department_id])
+                console.log(roleData);
+                console.log(`Added ${role} to the database`)
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+        newRole();
+    })
 };
 
 function updateEmployeeRole() {
@@ -158,6 +170,25 @@ function updateEmployeeRole() {
         .then((data) => {
             console.log("Updated employee's role")
         })
+}
+
+//Returns the department ID based on the role
+function departmentID(department) {
+    let departmentID = '';
+    switch(department) {
+        case 'Engineering':
+            departmentID = 1
+            break;
+        case 'Finance':
+            departmentID = 2
+            break;
+        case 'Legal':
+            departmentID = 3
+            break;
+        case 'Sales':
+            departmentID = 4;
+    }
+    return departmentID;
 }
 
 //Returns the role ID based on the role
@@ -211,4 +242,4 @@ function managerID(manager) {
     return managerID;
 }
 // userOptions();
-addEmployee();
+addRole();
