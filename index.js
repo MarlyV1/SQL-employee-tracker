@@ -94,20 +94,26 @@ function addEmployee() {
             type: "list",
             name: "manager",
             message: "Who is the employee's manager?",
-            choices: ["Jane Smith", "Tom Allen", "Paul Parker", "Horacio Cane"]
+            choices: ["John Doe", "Thalia Brown", "Michelle Johnson", "Alex Woods"]
         }
     ])
     .then((data) => {
-        console.log(`Added ${data.firstName} ${data.lastName} to the database`)
-    })
-
-    async function newEmployee() {
-        const { firstName, lastName, role, manager } = data.name;
-        const role_id = parseInt(roleID(role));
-        const client = pool.connect();
-        const employeeData = await client.query(`insert into employee(firstName, lastName, role_id, manager_id) values($1, $2, $3, $4)`, [firstName, lastName, role_id, manager_id])
-
-    }
+        
+        async function newEmployee() {
+            try {
+                const { firstName, lastName, manager, role } = data;
+                const role_id = roleID(role);
+                const manager_id = managerID(manager);
+                const client = await pool.connect();
+                const employeeData = await client.query(`insert into employee(first_name, last_name, role_id, manager_id) values($1, $2, $3, $4)`, [firstName, lastName, role_id, manager_id])
+                console.log(employeeData);
+                console.log(`Added ${firstName} ${lastName} to the database`)
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+        newEmployee();
+     })
 };
 
 function addRole() {
@@ -156,7 +162,7 @@ function updateEmployeeRole() {
 
 //Returns the role ID based on the role
 function roleID(role) {
-    const roleID = '';
+    let roleID = '';
 
     switch(role) {
         case 'Sales Lead':
@@ -188,22 +194,21 @@ function roleID(role) {
 
 //Returns the manager ID based on the manager name
 function managerID(manager) {
-    const managerID = '';
+    let managerID = '';
     switch(manager) {
-        case 'Jane Smith':
+        case 'John Doe':
             managerID = 1
             break;
-        case 'Tom Allen':
+        case 'Thalia Brown':
             managerID = 3
             break;
-        case 'Paul Parker':
+        case 'Michelle Johnson':
             managerID = 5
             break;
-        case 'Horacio Cane':
-            managerID = 7
-            break;
+        case 'Alex Woods':
+            managerID = 7;
     }
     return managerID;
 }
 // userOptions();
-addDepartment();
+addEmployee();
