@@ -94,7 +94,7 @@ function addEmployee() {
             type: "list",
             name: "manager",
             message: "Who is the employee's manager?",
-            choices: ["Jane Smith", "Tom Allen", "Paul Parker", "Horacio Caner"]
+            choices: ["Jane Smith", "Tom Allen", "Paul Parker", "Horacio Cane"]
         }
     ])
     .then((data) => {
@@ -103,6 +103,7 @@ function addEmployee() {
 
     async function newEmployee() {
         const { firstName, lastName, role, manager } = data.name;
+        const role_id = parseInt(roleID(role));
         const client = pool.connect();
         const employeeData = await client.query(`insert into employee(firstName, lastName, role_id, manager_id) values($1, $2, $3, $4)`, [firstName, lastName, role_id, manager_id])
 
@@ -153,5 +154,56 @@ function updateEmployeeRole() {
         })
 }
 
+//Returns the role ID based on the role
+function roleID(role) {
+    const roleID = '';
+
+    switch(role) {
+        case 'Sales Lead':
+             roleID = 1
+            break;
+        case 'Salesperson':
+            roleID = 2
+            break;
+        case 'Lead Engineer':
+            roleID = 3
+            break;
+        case 'Software Engineer':
+            roleID = 4
+            break;
+        case 'Account Manager':
+            roleID = 5
+            break;
+        case 'Accountant':
+            roleID = 6
+            break;
+        case 'Legal Team Lead':
+            roleID = 7
+            break;
+        case 'Lawyer':
+            roleID = 8;
+    }
+    return roleID;
+}
+
+//Returns the manager ID based on the manager name
+function managerID(manager) {
+    const managerID = '';
+    switch(manager) {
+        case 'Jane Smith':
+            managerID = 1
+            break;
+        case 'Tom Allen':
+            managerID = 3
+            break;
+        case 'Paul Parker':
+            managerID = 5
+            break;
+        case 'Horacio Cane':
+            managerID = 7
+            break;
+    }
+    return managerID;
+}
 // userOptions();
 addDepartment();
