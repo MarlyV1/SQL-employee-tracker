@@ -97,9 +97,16 @@ function addEmployee() {
             choices: ["Jane Smith", "Tom Allen", "Paul Parker", "Horacio Caner"]
         }
     ])
-        .then((data) => {
-            console.log(`Added ${data.firstName} ${data.lastName} to the database`)
-        })
+    .then((data) => {
+        console.log(`Added ${data.firstName} ${data.lastName} to the database`)
+    })
+
+    async function newEmployee() {
+        const { firstName, lastName, role, manager } = data.name;
+        const client = pool.connect();
+        const employeeData = await client.query(`insert into employee(firstName, lastName, role_id, manager_id) values($1, $2, $3, $4)`, [firstName, lastName, role_id, manager_id])
+
+    }
 };
 
 function addRole() {
