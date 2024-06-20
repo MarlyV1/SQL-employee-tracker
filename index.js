@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const { Pool } = require('pg');
 
 
 function userOptions() {
@@ -122,5 +123,18 @@ function updateEmployeeRole() {
             console.log("Updated employee's role")
         })
 }
+
+//Connects to the employees database
+const pool = new Pool(
+    {
+     user: '',
+     password: '',
+     host: 'localhost',
+     database: 'employees_db'   
+    },
+    console.log('Connected to employees_db database')
+)
+
+pool.connect();
 
 userOptions();
