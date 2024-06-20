@@ -1,6 +1,17 @@
+require('dotenv').config();
 const inquirer = require('inquirer');
 const { Pool } = require('pg');
 
+//Connects to the employees database
+const pool = new Pool(
+    {
+        user: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        host: process.env.DB_HOST,
+        database: 'employees_db'
+    },
+    console.log('Connected to employees_db database')
+)
 
 function userOptions() {
     inquirer.prompt([
@@ -11,26 +22,26 @@ function userOptions() {
             choices: ["View All Employees", "Add Employee", "Update Employee Role", "Add Role", "View All Departments", "Add Department", "Quit"]
         }
     ])
-    .then((data) => {
-        console.log(data);
-        
-        data = data.choices;
+        .then((data) => {
+            console.log(data);
 
-        if (data === "View All Employees") {
+            data = data.choices;
 
-        } else if (data === "Add Employees") {
+            if (data === "View All Employees") {
 
-        } else if (data === "Update Employee Role") {
-            updateEmployeeRole();
-        } else if (data === "Add Role") {
-            addRole();
-        } else if (data === "View All Departments") {
+            } else if (data === "Add Employees") {
 
-        } else if (data === "Add Department") {
-            addDepartment();
-        }
-        return;
-    })
+            } else if (data === "Update Employee Role") {
+                updateEmployeeRole();
+            } else if (data === "Add Role") {
+                addRole();
+            } else if (data === "View All Departments") {
+
+            } else if (data === "Add Department") {
+                addDepartment();
+            }
+            return;
+        })
 
 }
 
@@ -44,10 +55,21 @@ function addDepartment() {
             message: "What is the name of the department?"
         }
     ])
-        .then((data) => {
-
-            console.log(`Added ${data.department} to the database`)
-        })
+    .then((data) => {
+       
+        async function department() {
+            try {
+                const department = data.department;
+                const client = await pool.connect();
+                const departmentData = await client.query(`insert into department(name) values ($1)`, [department])
+                console.log(departmentData);
+                console.log(`Added ${department} to the database`)
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+        department();
+    })
 };
 
 function addEmployee() {
@@ -124,17 +146,5 @@ function updateEmployeeRole() {
         })
 }
 
-//Connects to the employees database
-const pool = new Pool(
-    {
-     user: '',
-     password: '',
-     host: 'localhost',
-     database: 'employees_db'   
-    },
-    console.log('Connected to employees_db database')
-)
-
-pool.connect();
-
-userOptions();
+// userOptions();
+addDepartment();
