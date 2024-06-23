@@ -138,25 +138,6 @@ async function addRolePrompt() {
     })
 };
 
-async function allEmployees() {
-    try {
-        
-    } catch (error) {
-        
-    }
-    const array = [];
-    const client = await pool.connect();
-    const updatedData = await client.query(`select first_name||' '||last_name as employee_name, id from employee;`);
-
-    const rows = updatedData.rows
-    
-
-    rows.forEach((e) => {
-        array.push(e.employee_name);
-    })
-    return array;
-}
-
 //Prompts the user to update a role
  async function updateRolePrompt() {
     
