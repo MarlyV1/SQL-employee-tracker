@@ -169,17 +169,22 @@ async function allEmployees() {
     return array;
 }
 
+//Prompts the user to update a role
  async function updateRolePrompt() {
     
     const allEmployeeNames = [];
+    const allRoles = [];
     const client = await pool.connect();
-    const data = await client.query(`select first_name||' '||last_name as employee_name, id from employee;`);
-    const rows = data.rows
+    const employeeData = (await client.query(`select first_name||' '||last_name as employee_name, id from employee;`)).rows;
+    const rolesData = (await client.query(`select * from role;`)).rows;
+    // const rows = employeeData.rows
 
-    rows.forEach((data) => {
+    employeeData.forEach((data) => {
         allEmployeeNames.push(data.employee_name);
     })     
-
+     rolesData.forEach((data) => {
+        allRoles.push(data.role);
+     })
     inquirer.prompt([
         {
             type: "list",
@@ -191,14 +196,13 @@ async function allEmployees() {
             type: "list",
             name: "role",
             message: "Which role do you want to assign the selected employee?",
-            choices: ['Sales Lead', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer']
+            choices: allRoles
         }
     ])
     .then((data) => {
-        updateRole(data, rows);
-        console.log(`Updated ${data.employee}'s role`);
-
-    })
+        updateRole(data, employeeData);
+        console.log(`Updated ${data.employee}'s role to ${data.role}`);
+    });
 }
 
 //Updates the role of an employee
@@ -214,10 +218,10 @@ async function updateRole(data, rows) {
                 console.log(e.id);
                 return id = e.id;
             }   
-        })
+        });
         const client = await pool.connect();
-        const updatedRole = await client.query(`update employee set role_id = $1 where id = $2`, role_id, id)
-        console.log(updatedRole);
+        const updatedRole = await client.query(`update employee set role_id = $1 where id = $2`, [role_id, id]);
+        console.log(updatedRole.rows);
     } catch (error) {
         console.log(error.message);
     } 
