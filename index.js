@@ -209,10 +209,10 @@ async function allEmployees() {
 async function updateRole(data, rows) {
     try {
         const { employee, role } = data;
-        let role_id = roleID(role);
+        let role_id = await roleID(role);
         let id = '';
 
-        console.log(rows)
+        // console.log(rows)
         rows.forEach((e) => {
             if(e.employee_name === employee){
                 console.log(e.id);
@@ -223,7 +223,7 @@ async function updateRole(data, rows) {
         const updatedRole = await client.query(`update employee set role_id = $1 where id = $2`, [role_id, id]);
         console.log(updatedRole.rows);
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
     } 
 }
 
@@ -278,36 +278,24 @@ function departmentID(department) {
 }
 
 //Returns the role ID based on the role
-function roleID(role) {
-    let roleID = '';
+async function roleID(role) {
+    try {
+        let roleID = '';
 
-    switch(role) {
-        case 'Sales Lead':
-             roleID = 1
-            break;
-        case 'Salesperson':
-            roleID = 2
-            break;
-        case 'Lead Engineer':
-            roleID = 3
-            break;
-        case 'Software Engineer':
-            roleID = 4
-            break;
-        case 'Account Manager':
-            roleID = 5
-            break;
-        case 'Accountant':
-            roleID = 6
-            break;
-        case 'Legal Team Lead':
-            roleID = 7
-            break;
-        case 'Lawyer':
-            roleID = 8;
+        const client = await pool.connect();
+        const roles = (await client.query(`select * from role`)).rows;
+        console.log(roles)
+        roles.forEach((data) => {
+            if(data.role === role) {
+                console.log(data.id)
+                roleID = data.id;
+            }
+        })
+        return roleID;
+    } catch (error) {
+        console.error(error.message)
     }
-    return roleID;
-}
+};
 
 //Returns the manager ID based on the manager name
 function managerID(manager) {
