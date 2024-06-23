@@ -45,29 +45,17 @@ function userOptions() {
 }
 
 
-
-function addDepartment() {
+//Prompts the user to add a new department
+function addDepartmentPrompt() {
     inquirer.prompt([
         {
             type: "input",
             name: "department",
-            message: "What is the name of the department?"
+            message: "What is the name of the new department?"
         }
     ])
     .then((data) => {
-       
-        async function department() {
-            try {
-                const department = data.department;
-                const client = await pool.connect();
-                const departmentData = await client.query(`insert into department(name) values ($1)`, [department])
-                console.log(departmentData);
-                console.log(`Added ${department} to the database`)
-            } catch (error) {
-                console.log(error.message);
-            }
-        }
-        department();
+        newDepartment(data);
     })
 };
 
@@ -321,6 +309,19 @@ async function newEmployee(data, managers) {
     } catch (error) {
         console.error(error.message);
     }
-}
+};
+
+//Adds the new department to the database
+async function newDepartment(data) {
+    try {
+        const { department } = data;
+        const client = await pool.connect();
+        const departmentData = await client.query(`insert into department(name) values ($1)`, [department])
+        console.log(departmentData);
+        console.log(`Added ${department} to the department database`)
+    } catch (error) {
+        console.error(error.message);
+    }
+};
 // userOptions();
-addEmployeePrompt()
+addDepartmentPrompt()
