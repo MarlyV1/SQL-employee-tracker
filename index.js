@@ -44,7 +44,7 @@ function addDepartmentPrompt() {
 
 //Prompts the user to add a new employee
 async function addEmployeePrompt() {
-    const allManagers = [];
+    let allManagers = ["None"];
     const allRoles = [];
 
     const client = await pool.connect();
@@ -101,7 +101,7 @@ async function addRolePrompt() {
     inquirer.prompt([
         {
             type: "input",
-            name: "role",
+            name: "title",
             message: "What is the name of the role?"
         },
         {
@@ -171,29 +171,25 @@ async function userOptions(data) {
             console.table(viewEmployees);
             userOptionsPrompt()
             break;
-        case "Add Employees":
+        case "Add Employee":
             addEmployeePrompt();
-            userOptionsPrompt()
             break;
         case "Update Employee Role":
             updateRolePrompt();
-            userOptionsPrompt()
             break;
         case "View All Roles":
             console.table(viewRoles);
-            userOptionsPrompt()
+            userOptionsPrompt();
             break;
         case "Add Role":
             addRolePrompt();
-            userOptionsPrompt()
           break;
         case "View All Departments":
             console.table(viewDepartments);
-            userOptionsPrompt()
+            userOptionsPrompt();
           break;
         case "Add Department":
             addDepartmentPrompt();
-            userOptionsPrompt();
       }
 }
 
@@ -201,16 +197,17 @@ async function userOptions(data) {
 async function newRole(data, departments) {
     try {
         let department_id = '';
-        const { role, salary, department } = data;
+        const { title, salary, department } = data;
         departments.forEach((data) => {
             if(data.name === department) {
                 return department_id = data.id;
             }
         })
         const client = await pool.connect();
-        const roleData = await client.query(`insert into role (role, salary, department_id) values($1, $2, $3)`, [role, salary, department_id])
-        console.log(roleData);
-        console.log(`Added ${role} to the database`)
+        const roleData = await client.query(`insert into role (title, salary, department_id) values($1, $2, $3)`, [title, salary, department_id])
+        // console.log(roleData);
+        console.log(`Added ${title} to the database`);
+        userOptionsPrompt();
      } catch (error) {
          console.error(error.message);
      }
@@ -226,13 +223,15 @@ async function updateRole(data, rows) {
         // console.log(rows)
         rows.forEach((e) => {
             if(e.employee_name === employee){
-                console.log(e.id);
+                // console.log(e.id);
                 return id = e.id;
             }   
         });
         const client = await pool.connect();
         const updatedRole = await client.query(`update employee set role_id = $1 where id = $2`, [role_id, id]);
-        console.log(updatedRole.rows);
+        // console.log(updatedRole.rows);
+        console.log(`Updated ${employee}'s role to ${role}`)
+        userOptionsPrompt();
     } catch (error) {
         console.error(error.message);
     } 
@@ -245,10 +244,10 @@ async function roleID(role) {
 
         const client = await pool.connect();
         const roles = (await client.query(`select * from role`)).rows;
-        console.log(roles)
+        // console.log(roles)
         roles.forEach((data) => {
             if(data.title === role) {
-                console.log(data.id)
+                // console.log(data.id)
                 roleID = data.id;
             }
         })
@@ -266,16 +265,17 @@ async function newEmployee(data, managers) {
         const { firstName, lastName, role, manager } = data;
         let role_id = await roleID(role);
 
-        managers.forEach((data) =>{
-            if(data.manager_name === manager) {
-                manager_id = data.id;
+        managers.forEach((e) =>{
+            if(e.manager_name === manager) {
+                manager_id = e.id;
+            } else {
+                manager_id = null;
             }
         })
         const client = await pool.connect();
         const employeeData = await client.query(`insert into employee(first_name, last_name, role_id, manager_id) values($1, $2, $3, $4)`, [firstName, lastName, role_id, manager_id])
-        // console.log(employeeData);
-        console.log(`Added ${firstName} ${lastName} to the database`)
-       
+        console.log(`Added ${firstName} ${lastName} to the database`);
+        userOptionsPrompt();
     } catch (error) {
         console.error(error.message);
     }
@@ -287,11 +287,12 @@ async function newDepartment(data) {
         const { department } = data;
         const client = await pool.connect();
         const departmentData = await client.query(`insert into department(name) values ($1)`, [department])
-        console.log(departmentData);
-        console.log(`Added ${department} to the department database`)
+        // console.log(departmentData);
+        console.log(`The ${department} department was added`);
+        userOptionsPrompt();
     } catch (error) {
         console.error(error.message);
     }
 };
 
-userOptionsPrompt()
+userOptionsPrompt();
