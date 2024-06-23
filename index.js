@@ -1,6 +1,7 @@
 require('dotenv').config();
 const inquirer = require('inquirer');
 const { Pool } = require('pg');
+// const array = [];
 
 //Connects to the employees database
 const pool = new Pool(
@@ -24,9 +25,6 @@ function userOptions() {
     ])
         .then((data) => {
             console.log(data);
-
-            
-
             if (data === "View All Employees") {
 
             } else if (data === "Add Employees") {
@@ -152,24 +150,108 @@ function addRole() {
     })
 };
 
-function updateEmployeeRole() {
+async function allEmployees() {
+    try {
+        
+    } catch (error) {
+        
+    }
+    const array = [];
+    const client = await pool.connect();
+    const updatedData = await client.query(`select first_name||' '||last_name as employee_name, id from employee;`);
+
+    const rows = updatedData.rows
+    
+
+    rows.forEach((e) => {
+        array.push(e.employee_name);
+    })
+    return array;
+}
+
+ async function updateRolePrompt() {
+    
+    const allEmployeeNames = [];
+    const client = await pool.connect();
+    const data = await client.query(`select first_name||' '||last_name as employee_name, id from employee;`);
+    const rows = data.rows
+
+    rows.forEach((data) => {
+        allEmployeeNames.push(data.employee_name);
+    })     
+
     inquirer.prompt([
         {
             type: "list",
             name: 'employee',
             message: "Which employee's role do you want to update?",
-            choices: ["John Doe", "Jane Smith", "Thalia Brown", "Tom Allen", "Michelle Johnson", "Paul Parker", "Alex Woods", "Horacio Cane"]
+            choices: allEmployeeNames
         },
         {
             type: "list",
             name: "role",
             message: "Which role do you want to assign the selected employee?",
-            choices: ["Sales Lead", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Customer Service"]
+            choices: ['Sales Lead', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer']
         }
     ])
-        .then((data) => {
-            console.log("Updated employee's role")
+    .then((data) => {
+        updateRole(data, rows);
+        console.log(`Updated ${data.employee}'s role`);
+
+    })
+}
+
+//Updates the role of an employee
+async function updateRole(data, rows) {
+    try {
+        const { employee, role } = data;
+        let role_id = roleID(role);
+        let id = '';
+
+        console.log(rows)
+        rows.forEach((e) => {
+            if(e.employee_name === employee){
+                console.log(e.id);
+                return id = e.id;
+            }   
         })
+        const client = await pool.connect();
+        const updatedRole = await client.query(`update employee set role_id = $1 where id = $2`, role_id, id)
+        console.log(updatedRole);
+    } catch (error) {
+        console.log(error.message);
+    } 
+}
+
+
+function employeeID(employee) {
+    const employeeID = '';
+    switch(employee) {
+        case 'John Doe':
+            employeeID = 1
+            break;
+        case 'Jane Smith':
+            employeeID = 2
+            break;
+        case 'Thalia Brown':
+            employeeID = 3
+            break;
+        case 'Tom Allen':
+            employeeID = 4
+            break;
+        case 'Michelle Johnson':
+            employeeID = 5
+            break;
+        case 'Paul Parker':
+            employeeID = 6
+            break;
+        case 'Alex Woods':
+            employeeID = 7
+            break;
+        case 'Horacio Cane':
+            employeeID = 8;
+    }
+    return employeeID;
 }
 
 //Returns the department ID based on the role
@@ -242,4 +324,4 @@ function managerID(manager) {
     return managerID;
 }
 // userOptions();
-addRole();
+updateRolePrompt()
