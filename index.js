@@ -71,10 +71,18 @@ function addDepartment() {
     })
 };
 
+//Prompts the user to add a new employee
 async function addEmployeePrompt() {
     const allManagers = [];
+    const allRoles = [];
+
     const client = await pool.connect();
+    const roles = (await client.query(`select * from role`)).rows;
     const managers = (await client.query(`select employee.first_name||' '||employee.last_name as manager_name, id from employee where manager_id is null;`)).rows;
+
+    roles.forEach((data) => {
+        allRoles.push(data.role);
+    })
 
     managers.forEach((data) => {
         allManagers.push(data.manager_name);
@@ -95,7 +103,7 @@ async function addEmployeePrompt() {
             type: "list",
             name: "role",
             message: "What is the employee's role?",
-            choices: ["Sales Lead", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Customer Service"]
+            choices: allRoles
         },
         {
             type: "list",
@@ -105,7 +113,6 @@ async function addEmployeePrompt() {
         }
     ])
     .then((data) => {
-        
         newEmployee(data, managers);
      })
 };
