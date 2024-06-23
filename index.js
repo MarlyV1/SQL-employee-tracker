@@ -14,6 +14,7 @@ const pool = new Pool(
     console.log('Connected to employees_db database')
 )
 
+
 function userOptions() {
     inquirer.prompt([
         {
@@ -70,7 +71,15 @@ function addDepartment() {
     })
 };
 
-function addEmployee() {
+async function addEmployeePrompt() {
+    const allManagers = [];
+    const client = await pool.connect();
+    const managers = (await client.query(`select employee.first_name||' '||employee.last_name as manager_name, id from employee where manager_id is null;`)).rows;
+
+    managers.forEach((data) => {
+        allManagers.push(data.manager_name);
+    })
+
     inquirer.prompt([
         {
             type: "input",
@@ -92,25 +101,12 @@ function addEmployee() {
             type: "list",
             name: "manager",
             message: "Who is the employee's manager?",
-            choices: ["John Doe", "Thalia Brown", "Michelle Johnson", "Alex Woods"]
+            choices: allManagers
         }
     ])
     .then((data) => {
         
-        async function newEmployee() {
-            try {
-                const { firstName, lastName, manager, role } = data;
-                const role_id = roleID(role);
-                const manager_id = managerID(manager);
-                const client = await pool.connect();
-                const employeeData = await client.query(`insert into employee(first_name, last_name, role_id, manager_id) values($1, $2, $3, $4)`, [firstName, lastName, role_id, manager_id])
-                console.log(employeeData);
-                console.log(`Added ${firstName} ${lastName} to the database`)
-            } catch (error) {
-                console.log(error.message);
-            }
-        }
-        newEmployee();
+        newEmployee(data, managers);
      })
 };
 
@@ -297,23 +293,27 @@ async function roleID(role) {
     }
 };
 
-//Returns the manager ID based on the manager name
-function managerID(manager) {
-    let managerID = '';
-    switch(manager) {
-        case 'John Doe':
-            managerID = 1
-            break;
-        case 'Thalia Brown':
-            managerID = 3
-            break;
-        case 'Michelle Johnson':
-            managerID = 5
-            break;
-        case 'Alex Woods':
-            managerID = 7;
+//Adds the new employee to the database
+async function newEmployee(data, managers) {
+    
+    try {
+        let manager_id = '';
+        const { firstName, lastName, role, manager } = data;
+        let role_id = await roleID(role);
+
+        managers.forEach((data) =>{
+            if(data.manager_name === manager) {
+                manager_id = data.id;
+            }
+        })
+        const client = await pool.connect();
+        const employeeData = await client.query(`insert into employee(first_name, last_name, role_id, manager_id) values($1, $2, $3, $4)`, [firstName, lastName, role_id, manager_id])
+        // console.log(employeeData);
+        console.log(`Added ${firstName} ${lastName} to the database`)
+       
+    } catch (error) {
+        console.error(error.message);
     }
-    return managerID;
 }
 // userOptions();
-updateRolePrompt()
+addEmployeePrompt()
