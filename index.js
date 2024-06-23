@@ -208,7 +208,7 @@ async function newRole(data, departments) {
         console.log(roleData);
         console.log(`Added ${role} to the database`)
      } catch (error) {
-         console.log(error.message);
+         console.error(error.message);
      }
  }
 
@@ -232,56 +232,6 @@ async function updateRole(data, rows) {
     } catch (error) {
         console.error(error.message);
     } 
-}
-
-
-function employeeID(employee) {
-    const employeeID = '';
-    switch(employee) {
-        case 'John Doe':
-            employeeID = 1
-            break;
-        case 'Jane Smith':
-            employeeID = 2
-            break;
-        case 'Thalia Brown':
-            employeeID = 3
-            break;
-        case 'Tom Allen':
-            employeeID = 4
-            break;
-        case 'Michelle Johnson':
-            employeeID = 5
-            break;
-        case 'Paul Parker':
-            employeeID = 6
-            break;
-        case 'Alex Woods':
-            employeeID = 7
-            break;
-        case 'Horacio Cane':
-            employeeID = 8;
-    }
-    return employeeID;
-}
-
-//Returns the department ID based on the role
-function departmentID(department) {
-    let departmentID = '';
-    switch(department) {
-        case 'Engineering':
-            departmentID = 1
-            break;
-        case 'Finance':
-            departmentID = 2
-            break;
-        case 'Legal':
-            departmentID = 3
-            break;
-        case 'Sales':
-            departmentID = 4;
-    }
-    return departmentID;
 }
 
 //Returns the role ID based on the role
