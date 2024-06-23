@@ -1,7 +1,6 @@
 require('dotenv').config();
 const inquirer = require('inquirer');
 const { Pool } = require('pg');
-// const array = [];
 
 //Connects to the employees database
 const pool = new Pool(
@@ -21,11 +20,11 @@ function userOptionsPrompt() {
             type: "list",
             name: "listOption",
             message: "What would you like to do?",
-            choices: ["View All Employees", "Add Employee", "Update Employee Role", "Add Role", "View All Departments", "Add Department", "Quit"]
+            choices: ["View All Employees", "Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"]
         }
     ])
     .then((data) => {
-        userOptions(data);
+         userOptions(data);
     })
 };
 
@@ -53,7 +52,7 @@ async function addEmployeePrompt() {
     const managers = (await client.query(`select employee.first_name||' '||employee.last_name as manager_name, id from employee where manager_id is null;`)).rows;
 
     roles.forEach((data) => {
-        allRoles.push(data.role);
+        allRoles.push(data.title);
     })
 
     managers.forEach((data) => {
@@ -156,26 +155,46 @@ async function addRolePrompt() {
         updateRole(data, employeeData);
         console.log(`Updated ${data.employee}'s role to ${data.role}`);
     });
-}
+};
 
 async function userOptions(data) {
     const client = await pool.connect();
-    const viewEmployees = await client.query(`select *`)
     const { listOption } = data;
-    if (listOption === "View All Employees") {
 
-    } else if (listOption === "Add Employees") {
-        addEmployeePrompt();
-    } else if (listOption === "Update Employee Role") {
-        updateRolePrompt();
-    } else if (listOption === "Add Role") {
-        addRolePrompt();
-    } else if (listOption === "View All Departments") {
-        
-    } else if (listOption === "Add Department") {
-        addDepartmentPrompt();
-    }
-    return;
+    const viewEmployees = (await client.query(`select e.id, e.first_name || ' ' || e.last_name AS employee, role.title, department.name as department, role.salary, m.first_name || ' ' || m.last_name AS manager from employee e LEFT JOIN employee m ON m.id = e.manager_id Join role on e.role_id = role.id Join department on role.department_id = department.id;`)).rows;
+
+    const viewRoles = (await client.query(`select r.id, r.title, d.name as department, r.salary from role r join department d on r.department_id = d.id;`)).rows;
+   
+    const viewDepartments = (await client.query(`select * from department`)).rows;
+    switch(listOption) {
+        case "View All Employees":
+            console.table(viewEmployees);
+            userOptionsPrompt()
+            break;
+        case "Add Employees":
+            addEmployeePrompt();
+            userOptionsPrompt()
+            break;
+        case "Update Employee Role":
+            updateRolePrompt();
+            userOptionsPrompt()
+            break;
+        case "View All Roles":
+            console.table(viewRoles);
+            userOptionsPrompt()
+            break;
+        case "Add Role":
+            addRolePrompt();
+            userOptionsPrompt()
+          break;
+        case "View All Departments":
+            console.table(viewDepartments);
+            userOptionsPrompt()
+          break;
+        case "Add Department":
+            addDepartmentPrompt();
+            userOptionsPrompt();
+      }
 }
 
 //Adds the new role to the database
@@ -274,5 +293,5 @@ async function newDepartment(data) {
         console.error(error.message);
     }
 };
-// userOptions();
+
 userOptionsPrompt()
