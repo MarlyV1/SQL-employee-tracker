@@ -14,36 +14,20 @@ const pool = new Pool(
     console.log('Connected to employees_db database')
 )
 
-
-function userOptions() {
+//Prompts the user about what they want to do
+function userOptionsPrompt() {
     inquirer.prompt([
         {
             type: "list",
-            name: "listOptions",
+            name: "listOption",
             message: "What would you like to do?",
             choices: ["View All Employees", "Add Employee", "Update Employee Role", "Add Role", "View All Departments", "Add Department", "Quit"]
         }
     ])
-        .then((data) => {
-            console.log(data);
-            if (data === "View All Employees") {
-
-            } else if (data === "Add Employees") {
-
-            } else if (data === "Update Employee Role") {
-                updateEmployeeRole();
-            } else if (data === "Add Role") {
-                addRole();
-            } else if (data === "View All Departments") {
-
-            } else if (data === "Add Department") {
-                addDepartment();
-            }
-            return;
-        })
-
-}
-
+    .then((data) => {
+        userOptions(data);
+    })
+};
 
 //Prompts the user to add a new department
 function addDepartmentPrompt() {
@@ -152,7 +136,7 @@ async function addRolePrompt() {
         allEmployeeNames.push(data.employee_name);
     })     
      rolesData.forEach((data) => {
-        allRoles.push(data.role);
+        allRoles.push(data.title);
      })
     inquirer.prompt([
         {
@@ -172,6 +156,26 @@ async function addRolePrompt() {
         updateRole(data, employeeData);
         console.log(`Updated ${data.employee}'s role to ${data.role}`);
     });
+}
+
+async function userOptions(data) {
+    const client = await pool.connect();
+    const viewEmployees = await client.query(`select *`)
+    const { listOption } = data;
+    if (listOption === "View All Employees") {
+
+    } else if (listOption === "Add Employees") {
+        addEmployeePrompt();
+    } else if (listOption === "Update Employee Role") {
+        updateRolePrompt();
+    } else if (listOption === "Add Role") {
+        addRolePrompt();
+    } else if (listOption === "View All Departments") {
+        
+    } else if (listOption === "Add Department") {
+        addDepartmentPrompt();
+    }
+    return;
 }
 
 //Adds the new role to the database
@@ -224,7 +228,7 @@ async function roleID(role) {
         const roles = (await client.query(`select * from role`)).rows;
         console.log(roles)
         roles.forEach((data) => {
-            if(data.role === role) {
+            if(data.title === role) {
                 console.log(data.id)
                 roleID = data.id;
             }
@@ -271,4 +275,4 @@ async function newDepartment(data) {
     }
 };
 // userOptions();
-addRolePrompt()
+userOptionsPrompt()
