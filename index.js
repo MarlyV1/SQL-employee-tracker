@@ -105,7 +105,16 @@ async function addEmployeePrompt() {
      })
 };
 
-function addRole() {
+//Prompts the user to add a new role
+async function addRolePrompt() {
+    let  allDepartments = [];
+
+    const client = await pool.connect();
+    const departments = (await client.query(`select * from department`)).rows;
+    departments.forEach((data) => {
+        allDepartments.push(data.name);
+    });
+
     inquirer.prompt([
         {
             type: "input",
@@ -121,23 +130,11 @@ function addRole() {
             type: "list",
             name: "department",
             message: "Which department does the role belong to?",
-            choices: ["Engineering", "Finance", "Legal", "Sales", "Service"]
+            choices: allDepartments
         }
     ])
     .then((data) => {
-        async function newRole() {
-           try {
-                const { role, salary, department } = data;
-                const department_id = departmentID(department);
-                const client = await pool.connect();
-                const roleData = await client.query(`insert into role (role, salary, department_id) values($1, $2, $3)`, [role, salary, department_id])
-                console.log(roleData);
-                console.log(`Added ${role} to the database`)
-            } catch (error) {
-                console.log(error.message);
-            }
-        }
-        newRole();
+       newRole(data, departments);
     })
 };
 
@@ -195,6 +192,25 @@ async function allEmployees() {
         console.log(`Updated ${data.employee}'s role to ${data.role}`);
     });
 }
+
+//Adds the new role to the database
+async function newRole(data, departments) {
+    try {
+        let department_id = '';
+        const { role, salary, department } = data;
+        departments.forEach((data) => {
+            if(data.name === department) {
+                return department_id = data.id;
+            }
+        })
+        const client = await pool.connect();
+        const roleData = await client.query(`insert into role (role, salary, department_id) values($1, $2, $3)`, [role, salary, department_id])
+        console.log(roleData);
+        console.log(`Added ${role} to the database`)
+     } catch (error) {
+         console.log(error.message);
+     }
+ }
 
 //Updates the role of an employee
 async function updateRole(data, rows) {
@@ -324,4 +340,4 @@ async function newDepartment(data) {
     }
 };
 // userOptions();
-addDepartmentPrompt()
+addRolePrompt()
